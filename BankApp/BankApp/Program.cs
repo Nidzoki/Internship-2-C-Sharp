@@ -1,5 +1,4 @@
-﻿
-static void PrintMainMenu(bool error)
+﻿static void PrintMainMenu(bool error)
 {
     Console.Clear();
     if (error)
@@ -10,8 +9,8 @@ static void PrintMainMenu(bool error)
     
 }
 
-static int MainMenu(bool error)
-{
+static void MainMenu(bool error)
+{   
     PrintMainMenu(error);
 
     var option = Console.ReadLine();
@@ -21,19 +20,22 @@ static int MainMenu(bool error)
         case "1":
             Console.Clear();
             UserMenu(false);
-            return MainMenu(false);
+            MainMenu(false);
+            break;
         case "2":
             Console.Clear();
             Console.WriteLine(" Odabrali ste izbornik Računi.");
             Console.ReadKey();
             // handle option 2
-            return MainMenu(false);
+            MainMenu(false);
+            break;
         case "3":
             Console.Clear();
             Console.WriteLine(" Napustili ste aplikaciju.");
-            return 0;
+            break;
         default:
-            return MainMenu(true);
+            MainMenu(true);
+            break;
     }
 }
 
@@ -50,7 +52,7 @@ static void PrintUserMenu(bool error)
     Console.WriteLine(" 5 - Natrag");
 }
 
-static int UserMenu(bool error)
+static void UserMenu(bool error)
 {
     PrintUserMenu(false);
 
@@ -59,33 +61,40 @@ static int UserMenu(bool error)
 
     switch (option) 
     {
-        case "1":
+        case "1": // ADD NEW USER
             Console.Clear();
             Console.WriteLine("\n Odabran je unos novog korisnika.");
+            // TODO: implement adding a user
             Console.ReadKey();
-            return MainMenu(false);
-        case "2":
+            break;
+
+        case "2": // DELETE USER 
             Console.Clear();
             Console.WriteLine("Odabrano je brisanje korisnika.");
+            // TODO: implement deleting a user
             Console.ReadKey();
-            return MainMenu(false);
-        case "3":
+            break;
+
+        case "3": // EDIT USER
             Console.Clear();
             Console.WriteLine("Odabrano uređivanje korisnika.");
+            // TODO: implement editing a user
             Console.ReadKey();
-            return MainMenu(false);
-        case "4":
+            break;
+
+        case "4": // PRINT USERS
             Console.Clear();
             Console.WriteLine("Odabran pregled korisnika.");
+            // TODO: implement printing all users
             Console.ReadKey();
-            return MainMenu(false);
-        case "5":
-            Console.Clear();
-            Console.WriteLine("Odabran izlaz.");
-            Console.ReadKey();
-            return MainMenu(false);
+            break;
+
+        case "5": // EXIT TO MAIN MENU
+            break;
+
         default:
-            return UserMenu(true);
+            UserMenu(false);
+            break;
     }
 
 }
