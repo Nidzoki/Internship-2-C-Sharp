@@ -1,7 +1,4 @@
 ﻿
-using System.Linq.Expressions;
-using System.Threading.Channels;
-
 static int PrintMainMenu(bool error)
 {
     Console.Clear();
@@ -41,6 +38,7 @@ static int MainMenu(bool error)
             return MainMenu(true);
     }
 }
+
 
 
 MainMenu(false);
