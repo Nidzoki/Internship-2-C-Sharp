@@ -3,7 +3,7 @@ static void PrintMainMenu(bool error)
 {
     Console.Clear();
     if (error)
-        Console.WriteLine("Pogrešno upisan odabir!");
+        Console.WriteLine(" Pogrešno upisan odabir!");
 
     Console.WriteLine("\n GLAVNI IZBORNIK\n\n 1 - Korisnici\n 2 - Računi\n 3 - Izlaz iz aplikacije");
     Console.Write("\n\n Vaš odabir: ");
@@ -24,13 +24,13 @@ static int MainMenu(bool error)
             return MainMenu(false);
         case "2":
             Console.Clear();
-            Console.WriteLine("Odabrali ste izbornik Računi.");
+            Console.WriteLine(" Odabrali ste izbornik Računi.");
             Console.ReadKey();
             // handle option 2
             return MainMenu(false);
         case "3":
             Console.Clear();
-            Console.WriteLine("Napustili ste aplikaciju.");
+            Console.WriteLine(" Napustili ste aplikaciju.");
             return 0;
         default:
             return MainMenu(true);
@@ -47,14 +47,46 @@ static void PrintUserMenu(bool error)
     Console.WriteLine("\ta) ispis svih korisnika abecedno po prezimenu");
     Console.WriteLine("\tb) ispis svih onih koji imaju više od 30 godina");
     Console.WriteLine("\tc) ispis svih onih koji imaju barem jedan račun u minusu");
+    Console.WriteLine(" 5 - Natrag");
 }
 
-static void UserMenu(bool error)
+static int UserMenu(bool error)
 {
     PrintUserMenu(false);
 
-    Console.ReadKey();
-    // implement handling user operations
+    //Console.ReadKey();
+    var option = Console.ReadLine();
+
+    switch (option) 
+    {
+        case "1":
+            Console.Clear();
+            Console.WriteLine("\n Odabran je unos novog korisnika.");
+            Console.ReadKey();
+            return MainMenu(false);
+        case "2":
+            Console.Clear();
+            Console.WriteLine("Odabrano je brisanje korisnika.");
+            Console.ReadKey();
+            return MainMenu(false);
+        case "3":
+            Console.Clear();
+            Console.WriteLine("Odabrano uređivanje korisnika.");
+            Console.ReadKey();
+            return MainMenu(false);
+        case "4":
+            Console.Clear();
+            Console.WriteLine("Odabran pregled korisnika.");
+            Console.ReadKey();
+            return MainMenu(false);
+        case "5":
+            Console.Clear();
+            Console.WriteLine("Odabran izlaz.");
+            Console.ReadKey();
+            return MainMenu(false);
+        default:
+            return UserMenu(true);
+    }
 
 }
 
