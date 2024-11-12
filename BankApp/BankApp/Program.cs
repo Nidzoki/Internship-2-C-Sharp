@@ -1,6 +1,4 @@
-﻿
-
-// test user list
+﻿// test user list
 var users = new List<Tuple<int, string, string, DateTime>>()
 {
     Tuple.Create(1, "Ante", "Antić", new DateTime(2001,09,21)),
@@ -78,6 +76,7 @@ static void PrintUserMenu(bool error) // Prints out user menu
     Console.WriteLine("\tb) ispis svih onih koji imaju više od 30 godina");
     Console.WriteLine("\tc) ispis svih onih koji imaju barem jedan račun u minusu");
     Console.WriteLine(" 5 - Natrag");
+    Console.Write("\n Vaš odabir: ");
 }
 
 static void UserMenu(bool error,ref List<Tuple<int, string, string, DateTime>> users, ref List<Tuple<int, string, double>> accounts) // User menu controller
@@ -91,16 +90,18 @@ static void UserMenu(bool error,ref List<Tuple<int, string, string, DateTime>> u
         case "1": // ADD NEW USER
             Console.Clear();
             Console.WriteLine("\n Odabran je unos novog korisnika.");
-            var message = UserCreateDialogue(false, ref users, ref accounts);
+            var addSuccess = UserCreateDialogue(ref users, ref accounts);
             Console.Clear();
-            Console.WriteLine("\n " + message + "\n\n Press any key to continue...");
+            Console.WriteLine("\n " + addSuccess + "\n\n Press any key to continue...");
             Console.ReadKey();
             break;
 
         case "2": // DELETE USER 
             Console.Clear();
             Console.WriteLine("Odabrano je brisanje korisnika.");
-            // TODO: implement deleting a user
+            var deleteSuccess = DeleteUserDialogue(false, ref users, ref accounts);
+            Console.Clear();
+            Console.WriteLine("\n " + deleteSuccess + "\n\n Press any key to continue...");
             Console.ReadKey();
             break;
 
@@ -206,7 +207,7 @@ static void PrintUsersInMinus(List<Tuple<int, string, string, DateTime>> users, 
 
 // User insertion
 
-static string UserCreateDialogue(bool error, ref List<Tuple<int, string, string, DateTime>> users, ref List<Tuple<int, string, double>> accounts)
+static string UserCreateDialogue(ref List<Tuple<int, string, string, DateTime>> users, ref List<Tuple<int, string, double>> accounts)
 {
     Console.Clear();
     Console.WriteLine("\n Upišite podatke o korisniku u formatu: ID IME PREZIME DATUM_ROĐENJA\n\n Napomena: Datum rođenja unijeti u formatu dd/MM/yyyy\n\n Unesite \"x\" za izlaz");
@@ -221,11 +222,15 @@ static string UserCreateDialogue(bool error, ref List<Tuple<int, string, string,
     {
         var strings = input.Split();
 
-        if (strings.Count() > 4) // error if there are more than 4 arguments
+        if (strings.Length > 4) // error if there are more than 4 arguments
             throw new Exception("Upisano je više od 4 argumenta!");
         
         var newUser = Tuple.Create(Int32.Parse(strings[0]), strings[1], strings[2], DateTime.Parse(strings[3])); // try to get data, if something went wrong,
         
+        if(newUser.Item1 < 0)
+        {
+            throw new Exception("ID ne smije biti negativan.");
+        }  
         if(!users.Any(x => x.Item1 == newUser.Item1)) // check if user id is taken
         {
             users.Add(newUser);
@@ -236,17 +241,102 @@ static string UserCreateDialogue(bool error, ref List<Tuple<int, string, string,
             return "Uneseni ID je zauzet!";
         }
     }
-    catch 
+    catch (Exception ex) 
     { 
-        return "Pogreška pri upisu podataka!"; 
+        return "Pogreška pri upisu podataka!\n\n " + ex.Message; 
     }
     
 }
 
 
+// Delete user
+
+static string DeleteUserDialogue(bool error, ref List<Tuple<int, string, string, DateTime>> users, ref List<Tuple<int, string, double>> accounts)
+{
+    Console.Clear();
+    
+    Console.WriteLine("\n IZBORNIK BRISANJA KORISNIKA\n");
+    if (error)
+        Console.WriteLine(" Pogrešan odabir!\n");
+    Console.WriteLine("\ta) Brisanje po ID-u");
+    Console.WriteLine("\tb) Brisanje po imenu i prezimenu");
+    Console.WriteLine("\tc) Izlaz\n");
+    Console.Write("Vaš odabir: ");
+    
+    var input = Console.ReadLine();
+
+    return input switch
+    {
+        "a" => DeleteUserById(false, ref users, ref accounts),//solved
+        "b" => DeleteUserByNameAndSurname(false, ref users, ref accounts),//solved
+        "c" => "Izlaz iz brisanja korisnika...",
+        _ => DeleteUserDialogue(true, ref users, ref accounts),
+    };
+}
+
+static string DeleteUserById(bool error, ref List<Tuple<int, string, string, DateTime>> users, ref List<Tuple<int, string, double>> accounts) // solved, i think
+{   
+    Console.Clear();
+    Console.WriteLine("\n BRISANJE KORISNIKA PO ID-u\n\n");
+    if (error)
+        Console.WriteLine("Pogreška pri unosu!\n");
+    Console.Write("\nUnesite ID za brisanje ili x za izlaz: ");
+
+    var input = Console.ReadLine();
+
+    if (input == "x")
+        return "Izlaz iz brisanja korisnika.";
+
+    try
+    {
+        var id = Int32.Parse(input);
+
+        if (id < 0)
+            throw new Exception("ID ne smije biti manji od 0!");
+
+        if (users.RemoveAll(x => x.Item1 == id) == 0)
+            throw new Exception("Korisnik sa unesenim ID-om ne postoji");
+
+        return "Korisnik uspješno izbrisan!";
+    }
+    catch ( Exception ex)
+    {
+        return " Greška pri brisanju korisnika!\n " + ex.Message; 
+    }
+}
+
+static string DeleteUserByNameAndSurname(bool error, ref List<Tuple<int, string, string, DateTime>> users, ref List<Tuple<int, string, double>> accounts) // solved i think
+{
+    Console.Clear();
+    Console.WriteLine("\n BRISANJE KORISNIKA PO IMENU I PREZIMENU\n\n");
+    if (error)
+        Console.WriteLine("Pogreška pri unosu!\n");
+    Console.Write("\nUnesite ime i prezime za brisanje ili x za izlaz: ");
+
+    var input = Console.ReadLine();
+
+    if (input == "x")
+        return "Izlaz iz brisanja korisnika.";
+
+    try
+    {
+        var strings = input.Split();
+
+        if (strings.Length != 2)
+            throw new Exception("Netočan format unosa!");
+
+        if (users.RemoveAll(x => x.Item2 == strings[0] && x.Item3 == strings[1]) == 0)
+            throw new Exception("Korisnik sa unesenim imenom i prezimenom ne postoji");
+
+        return "Korisnik uspješno izbrisan!";
+    }
+    catch (Exception ex)
+    {
+        return " Greška pri brisanju korisnika!\n " + ex.Message;
+    }
+}
+
 // Start of program
 
 MainMenu(false, ref users, ref accounts);
-
-//UserCreateDialogue(false, ref users, ref accounts);
 
