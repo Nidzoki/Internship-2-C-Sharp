@@ -1,4 +1,8 @@
-﻿// test user list
+﻿
+// test user list
+
+using System.Security.Principal;
+
 var users = new List<Tuple<int, string, string, DateTime>>()
 {
     Tuple.Create(1, "Ante", "Antić", new DateTime(2001,09,21)),
@@ -10,6 +14,7 @@ var users = new List<Tuple<int, string, string, DateTime>>()
 
 
 //test account list
+
 var accounts = new List<Tuple<int, string, double>>()
 {
     Tuple.Create(1, "žiro", 0.0),
@@ -21,6 +26,7 @@ var accounts = new List<Tuple<int, string, double>>()
 
 
 // Main menu
+
 static void PrintMainMenu(bool error) // Prints out Main menu text
 {
     Console.Clear();
@@ -89,7 +95,6 @@ static void UserMenu(bool error,ref List<Tuple<int, string, string, DateTime>> u
     {
         case "1": // ADD NEW USER
             Console.Clear();
-            Console.WriteLine("\n Odabran je unos novog korisnika.");
             var addSuccess = UserCreateDialogue(ref users, ref accounts);
             Console.Clear();
             Console.WriteLine("\n " + addSuccess + "\n\n Press any key to continue...");
@@ -98,7 +103,6 @@ static void UserMenu(bool error,ref List<Tuple<int, string, string, DateTime>> u
 
         case "2": // DELETE USER 
             Console.Clear();
-            Console.WriteLine("Odabrano je brisanje korisnika.");
             var deleteSuccess = DeleteUserDialogue(false, ref users, ref accounts);
             Console.Clear();
             Console.WriteLine("\n " + deleteSuccess + "\n\n Press any key to continue...");
@@ -107,8 +111,9 @@ static void UserMenu(bool error,ref List<Tuple<int, string, string, DateTime>> u
 
         case "3": // EDIT USER
             Console.Clear();
-            Console.WriteLine("Odabrano uređivanje korisnika.");
-            // TODO: implement editing a user
+            var editSuccess = EditUserDialogue(ref users, ref accounts);
+            Console.Clear();
+            Console.WriteLine("\n " + editSuccess + "\n\n Press any key to continue...");
             Console.ReadKey();
             break;
 
@@ -196,7 +201,7 @@ static void PrintUsersInMinus(List<Tuple<int, string, string, DateTime>> users, 
             continue;
         visited.Add(account.Item1);
 
-        var user = users.FirstOrDefault(x => x.Item1 == account.Item1, null);
+        var user = users.FirstOrDefault(x => x.Item1 == account.Item1);
 
         if (user != null)
             Console.WriteLine($" {user.Item1} - {user.Item2} - {user.Item3} - {user.Item4:dd/MM/yyyy}");
@@ -213,7 +218,9 @@ static string UserCreateDialogue(ref List<Tuple<int, string, string, DateTime>> 
     Console.WriteLine("\n Upišite podatke o korisniku u formatu: ID IME PREZIME DATUM_ROĐENJA\n\n Napomena: Datum rođenja unijeti u formatu dd/MM/yyyy\n\n Unesite \"x\" za izlaz");
     Console.Write("\n Vaš unos: ");
 
-    var input = Console.ReadLine().Trim();
+    var input = Console.ReadLine();
+
+    input = input == null ? "": input.Trim();
 
     if (input == "x")
         return "Napuštanje dodavanja korisnika...";
@@ -247,7 +254,6 @@ static string UserCreateDialogue(ref List<Tuple<int, string, string, DateTime>> 
     }
     
 }
-
 
 // Delete user
 
@@ -284,6 +290,9 @@ static string DeleteUserById(bool error, ref List<Tuple<int, string, string, Dat
 
     var input = Console.ReadLine();
 
+    if (input == null)
+        return "Greška!";
+
     if (input == "x")
         return "Izlaz iz brisanja korisnika.";
 
@@ -315,6 +324,9 @@ static string DeleteUserByNameAndSurname(bool error, ref List<Tuple<int, string,
 
     var input = Console.ReadLine();
 
+    if (input == null) 
+        return "Greška!";
+
     if (input == "x")
         return "Izlaz iz brisanja korisnika.";
 
@@ -336,7 +348,57 @@ static string DeleteUserByNameAndSurname(bool error, ref List<Tuple<int, string,
     }
 }
 
+// Edit user
+
+static string EditUserDialogue(ref List<Tuple<int, string, string, DateTime>> users, ref List<Tuple<int, string, double>> accounts)
+{
+    Console.WriteLine("\n UREĐIVANJE PODATAKA KORISNIKA\n\n");
+    Console.Write(" Unesite ID korisnika čije podatke želite urediti: ");
+
+    try
+    {
+        var input = Console.ReadLine();
+
+        if (input == null)
+            return "Greška!";
+
+        var id = Int32.Parse(input);
+
+        if (id < 0)
+            throw new Exception("ID ne smije biti negativan!");
+
+        if (!users.Any(x => x.Item1 == id))
+            throw new Exception("Korisnik ne postoji!");
+
+        Console.WriteLine("\n Podaci odabranog korisnika: " + users.Find(x => x.Item1 == id));
+        Console.WriteLine("\n Upišite podatke o korisniku u formatu: IME PREZIME DATUM_ROĐENJA\n\n Napomena: Datum rođenja unijeti u formatu dd/MM/yyyy\n\n Unesite \"x\" za izlaz");
+        Console.Write("\n Vaš unos: ");
+
+        var data = Console.ReadLine();
+
+        if (data == null)
+            return "Greška!";
+
+        if (data == "x")
+            return "Izlaz iz uređivanja podataka korisnika...";
+
+        var strings = data.Split();
+
+        if (strings.Length > 3) // error if there are more than 4 arguments
+            throw new Exception("Upisano je više od 3 argumenta!");
+
+        users[users.FindIndex(x=> x.Item1 == id)] = Tuple.Create(id, strings[0], strings[1], DateTime.Parse(strings[2]));
+
+        return "Podaci uspješno ažurirani!";
+
+    }
+    catch
+    {
+        return "Pogreška pri upisu podataka!\n\n ";
+    }
+}
+
+
 // Start of program
 
 MainMenu(false, ref users, ref accounts);
-
