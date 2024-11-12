@@ -22,9 +22,6 @@ var accounts = new List<Tuple<int, string, double>>()
 };
 
 
-
-
-
 // Main menu
 static void PrintMainMenu(bool error) // Prints out Main menu text
 {
@@ -37,7 +34,7 @@ static void PrintMainMenu(bool error) // Prints out Main menu text
     
 }
 
-static void MainMenu(bool error, List<Tuple<int, string, string, DateTime>> users, List<Tuple<int, string, double>> accounts) // Main menu controller
+static void MainMenu(bool error, ref List<Tuple<int, string, string, DateTime>> users, ref List<Tuple<int, string, double>> accounts) // Main menu controller
 {   
     PrintMainMenu(error);
 
@@ -47,22 +44,22 @@ static void MainMenu(bool error, List<Tuple<int, string, string, DateTime>> user
     {
         case "1":
             Console.Clear();
-            UserMenu(false, users, accounts);
-            MainMenu(false, users, accounts);
+            UserMenu(false, ref users, ref accounts);
+            MainMenu(false, ref users, ref accounts);
             break;
         case "2":
             Console.Clear();
             Console.WriteLine(" Odabrali ste izbornik Računi.");
             Console.ReadKey();
             // handle option 2
-            MainMenu(false, users, accounts);
+            MainMenu(false, ref users, ref accounts);
             break;
         case "3":
             Console.Clear();
             Console.WriteLine(" Napustili ste aplikaciju.");
             break;
         default:
-            MainMenu(true, users, accounts);
+            MainMenu(true, ref users, ref accounts);
             break;
     }
 }
@@ -83,7 +80,7 @@ static void PrintUserMenu(bool error) // Prints out user menu
     Console.WriteLine(" 5 - Natrag");
 }
 
-static void UserMenu(bool error, List<Tuple<int, string, string, DateTime>> users, List<Tuple<int, string, double>> accounts) // User menu controller
+static void UserMenu(bool error,ref List<Tuple<int, string, string, DateTime>> users, ref List<Tuple<int, string, double>> accounts) // User menu controller
 {
     PrintUserMenu(error);
 
@@ -94,7 +91,9 @@ static void UserMenu(bool error, List<Tuple<int, string, string, DateTime>> user
         case "1": // ADD NEW USER
             Console.Clear();
             Console.WriteLine("\n Odabran je unos novog korisnika.");
-            // TODO: implement adding a user
+            var message = UserCreateDialogue(false, ref users, ref accounts);
+            Console.Clear();
+            Console.WriteLine("\n " + message + "\n\n Press any key to continue...");
             Console.ReadKey();
             break;
 
@@ -113,22 +112,23 @@ static void UserMenu(bool error, List<Tuple<int, string, string, DateTime>> user
             break;
 
         case "4": // PRINT USERS
-            UserMenuOption(false, users, accounts);
+            UserMenuOption(false, ref users, ref accounts);
             break;
 
         case "5": // EXIT TO MAIN MENU
             break;
 
         default:
-            UserMenu(true, users, accounts);
+            UserMenu(true, ref users, ref accounts);
             break;
     }
 
 }
 
-static void UserMenuOption(bool error, List<Tuple<int, string, string, DateTime>> users, List<Tuple<int, string, double>> accounts)
+static void UserMenuOption(bool error, ref List<Tuple<int, string, string, DateTime>> users, ref List<Tuple<int, string, double>> accounts)
 {
     Console.Clear();
+    Console.WriteLine("\n IZBORNIK PREGLEDA KORISNIKA");
     if (error) 
         Console.WriteLine("\n Neispravan odabir! ");
     Console.WriteLine("\n\ta) ispis svih korisnika abecedno po prezimenu");
@@ -145,7 +145,7 @@ static void UserMenuOption(bool error, List<Tuple<int, string, string, DateTime>
             PrintUsersBySurname(users);
             Console.WriteLine("\n Press any key to continue...");
             Console.ReadKey();
-            UserMenu(false, users, accounts);
+            UserMenu(false, ref users, ref accounts);
             break;
 
         case "b": 
@@ -153,20 +153,20 @@ static void UserMenuOption(bool error, List<Tuple<int, string, string, DateTime>
             PrintUsersOverThirty(users);
             Console.WriteLine("\n Press any key to continue...");
             Console.ReadKey();
-            UserMenu(false, users, accounts);
+            UserMenu(false, ref users, ref accounts);
             break;
         case "c":
             Console.Clear();
             PrintUsersInMinus(users, accounts);
             Console.WriteLine("\n Press any key to continue...");
             Console.ReadKey();
-            UserMenu(false, users, accounts);
+            UserMenu(false, ref users, ref accounts);
             break;
         case "d":
-            UserMenu(false, users, accounts);
+            UserMenu(false, ref users, ref accounts);
             break;
         default:
-            UserMenuOption(true,users, accounts);
+            UserMenuOption(true,ref users, ref accounts);
             break;
     }
 }
@@ -176,13 +176,13 @@ static void UserMenuOption(bool error, List<Tuple<int, string, string, DateTime>
 static void PrintUsersBySurname(List<Tuple<int, string, string, DateTime>> users) // Prints out the user list alphabeticaly by surname
  {
     foreach (var user in users.OrderBy(x => x.Item3))
-        Console.WriteLine($" {user.Item1} - {user.Item2} - {user.Item3} - {user.Item4.ToString("dd/MM/yyyy")}");
+        Console.WriteLine($" {user.Item1} - {user.Item2} - {user.Item3} - {user.Item4:dd/MM/yyyy}");
 }
 
 static void PrintUsersOverThirty(List<Tuple<int, string, string, DateTime>> users) // Prints out users in the user list that are 30+ years old
 {
     foreach (var user in users.Where(x => (DateTime.Today - x.Item4) >= new TimeSpan(30*365,0,0,0)))
-        Console.WriteLine($" {user.Item1} - {user.Item2} - {user.Item3} - {user.Item4.ToString("dd/MM/yyyy")}");
+        Console.WriteLine($" {user.Item1} - {user.Item2} - {user.Item3} - {user.Item4:dd/MM/yyyy}");
 }
 
 static void PrintUsersInMinus(List<Tuple<int, string, string, DateTime>> users, List<Tuple<int, string, double>> accounts) // Prints out users that own accounts which are in minus
@@ -198,14 +198,55 @@ static void PrintUsersInMinus(List<Tuple<int, string, string, DateTime>> users, 
         var user = users.FirstOrDefault(x => x.Item1 == account.Item1, null);
 
         if (user != null)
-            Console.WriteLine($" {user.Item1} - {user.Item2} - {user.Item3} - {user.Item4.ToString("dd/MM/yyyy")}");
+            Console.WriteLine($" {user.Item1} - {user.Item2} - {user.Item3} - {user.Item4:dd/MM/yyyy}");
 
     }
 
 }
 
+// User insertion
+
+static string UserCreateDialogue(bool error, ref List<Tuple<int, string, string, DateTime>> users, ref List<Tuple<int, string, double>> accounts)
+{
+    Console.Clear();
+    Console.WriteLine("\n Upišite podatke o korisniku u formatu: ID IME PREZIME DATUM_ROĐENJA\n\n Napomena: Datum rođenja unijeti u formatu dd/MM/yyyy\n\n Unesite \"x\" za izlaz");
+    Console.Write("\n Vaš unos: ");
+
+    var input = Console.ReadLine().Trim();
+
+    if (input == "x")
+        return "Napuštanje dodavanja korisnika...";
+
+    try
+    {
+        var strings = input.Split();
+
+        if (strings.Count() > 4) // error if there are more than 4 arguments
+            throw new Exception("Upisano je više od 4 argumenta!");
+        
+        var newUser = Tuple.Create(Int32.Parse(strings[0]), strings[1], strings[2], DateTime.Parse(strings[3])); // try to get data, if something went wrong,
+        
+        if(!users.Any(x => x.Item1 == newUser.Item1)) // check if user id is taken
+        {
+            users.Add(newUser);
+            return "Korisnik uspješno dodan!";
+        }
+        else
+        {
+            return "Uneseni ID je zauzet!";
+        }
+    }
+    catch 
+    { 
+        return "Pogreška pri upisu podataka!"; 
+    }
+    
+}
 
 
 // Start of program
 
-MainMenu(false, users, accounts);
+MainMenu(false, ref users, ref accounts);
+
+//UserCreateDialogue(false, ref users, ref accounts);
+
