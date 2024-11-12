@@ -1,15 +1,11 @@
 ﻿
 // test user list
 
-using System.Security.Principal;
-
 var users = new List<Tuple<int, string, string, DateTime>>()
 {
     Tuple.Create(1, "Ante", "Antić", new DateTime(2001,09,21)),
     Tuple.Create(2, "Pero", "Perić", new DateTime(1999,10,22)),
-    Tuple.Create(3, "Lovre", "Lovrić", new DateTime(2000,11,23)),
-    Tuple.Create(4, "Karlo", "Karlović", new DateTime(2003,12,24)),
-    Tuple.Create(5, "Karlo", "Ima vise od 30", new DateTime(1973,12,24))
+    Tuple.Create(3, "Karlo", "Ima vise od 30", new DateTime(1973,12,24))
 };
 
 
@@ -19,9 +15,13 @@ var accounts = new List<Tuple<int, string, double>>()
 {
     Tuple.Create(1, "žiro", 0.0),
     Tuple.Create(1, "tekući", 2.0),
-    Tuple.Create(2, "žiro", -200.0),
-    Tuple.Create(1, "žiro", -1.0),
-    Tuple.Create(3, "žiro", 1.0),
+    Tuple.Create(1, "prepaid", -200.0),
+    Tuple.Create(2, "žiro", -1.0),
+    Tuple.Create(2, "tekući", 1.0),
+    Tuple.Create(2, "prepaid", 0.0),
+    Tuple.Create(3, "žiro", 2.0),
+    Tuple.Create(3, "tekući", -200.0),
+    Tuple.Create(3, "prepaid", -1.0)
 };
 
 
@@ -53,9 +53,11 @@ static void MainMenu(bool error, ref List<Tuple<int, string, string, DateTime>> 
             break;
         case "2":
             Console.Clear();
-            Console.WriteLine(" Odabrali ste izbornik Računi.");
+            var accountSuccess = AccountMenuController(ref users, ref accounts);
+            Console.Clear();
+            Console.WriteLine(accountSuccess);
+            Console.Write(" Press any key to continue...");
             Console.ReadKey();
-            // handle option 2
             MainMenu(false, ref users, ref accounts);
             break;
         case "3":
@@ -399,6 +401,52 @@ static string EditUserDialogue(ref List<Tuple<int, string, string, DateTime>> us
 }
 
 
+// Account menu
+
+static string AccountMenuController(ref List<Tuple<int, string, string, DateTime>> users, ref List<Tuple<int, string, double>> accounts)
+{
+    Console.Clear();
+    Console.WriteLine("\n ODABIR KORISNIKA\n");
+    Console.Write(" Unesite x za izlaz ili ime i prezime korisnika za pregled računa: ");
+    
+    var userNameAndSurname = Console.ReadLine();
+
+    if (userNameAndSurname == null)
+        return "Greška!";
+
+    if (userNameAndSurname == "x")
+        return "Izlaz iz pregleda računa...";
+
+    var strings = userNameAndSurname.Split();
+
+    if (strings.Length != 2)
+        return "Netočan format unesenih podataka!";
+
+    if (!users.Any(x => x.Item2 == strings[0] && x.Item3 == strings[1]))
+        return "Korisnik ne postoji!";
+
+    var userData = users.FirstOrDefault(x => x.Item2 == strings[0] && x.Item3 == strings[1]);
+
+    if (userData == null) 
+        return "Greška!";
+
+    Console.WriteLine($"\n Računi korisnika: {userData.Item2 + " " + userData.Item3}: ");
+
+    foreach (var account in accounts.Where(x => x.Item1 == userData.Item1))
+    {
+        Console.WriteLine("\t " + account);
+    }
+
+    Console.WriteLine("\n Press any key to continue...");
+    Console.ReadKey();
+    return " Izlaz iz pregleda\n";
+}
+
+//AccountMenuController(ref users, ref accounts);
+
+
 // Start of program
 
 MainMenu(false, ref users, ref accounts);
+
+
