@@ -1,8 +1,6 @@
 ﻿
 // test user list
 
-using System.Reflection.Metadata.Ecma335;
-
 var users = new List<Tuple<int, string, string, DateTime>>() // USER -> Tuple(int ID, string Name, string Surname, DateTime birthday)
 {
     Tuple.Create(1, "A"/*nte"*/, "A"/*ntić"*/, new DateTime(2001,09,21)),
@@ -16,21 +14,21 @@ var users = new List<Tuple<int, string, string, DateTime>>() // USER -> Tuple(in
 var accounts = new List<Tuple<int, string, double, List<Tuple<int, double, string, string, string, DateTime>>>>() // ACCOUNT -> Tuple(int UserID, string accountType, double balance, List of transactions(Tuple(id transactionID, double Value, string description, string Type, string category, DateTime time)))
 {
     Tuple.Create(1, "žiro", 0.0, new List<Tuple<int, double, string, string, string, DateTime>>(){Tuple.Create(1, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now)}),
-    Tuple.Create(1, "tekući", 2.0, new List<Tuple<int, double, string, string, string, DateTime>>()
+    Tuple.Create(1, "tekući", 100.0, new List<Tuple<int, double, string, string, string, DateTime>>()
     {
         Tuple.Create(1, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now),
         Tuple.Create(1, 8.1, "standardna transakcija", "prihod", "plaća", DateTime.Now),
-        Tuple.Create(1, 4.0, "standardna transakcija", "rashod", "prijevoz", DateTime.Now),
+        Tuple.Create(1, 400.0, "standardna transakcija", "rashod", "prijevoz", DateTime.Now),
         Tuple.Create(1, 11.5, "standardna transakcija", "prihod", "plaća", DateTime.Now),
         Tuple.Create(1, 20.1, "standardna transakcija", "prihod", "plaća", DateTime.Now)
     }),
-    Tuple.Create(1, "prepaid", -200.0, new List<Tuple<int, double, string, string, string, DateTime>>(){Tuple.Create(1, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now)}),
-    Tuple.Create(2, "žiro", -1.0, new List<Tuple<int, double, string, string, string, DateTime>>(){Tuple.Create(1, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now)}),
-    Tuple.Create(2, "tekući", 1.0, new List<Tuple<int, double, string, string, string, DateTime>>(){Tuple.Create(1, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now)}),
+    Tuple.Create(1, "prepaid", 0.0, new List<Tuple<int, double, string, string, string, DateTime>>(){Tuple.Create(1, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now)}),
+    Tuple.Create(2, "žiro", 0.0, new List<Tuple<int, double, string, string, string, DateTime>>(){Tuple.Create(1, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now)}),
+    Tuple.Create(2, "tekući", 100.0, new List<Tuple<int, double, string, string, string, DateTime>>(){Tuple.Create(1, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now)}),
     Tuple.Create(2, "prepaid", 0.0, new List<Tuple<int, double, string, string, string, DateTime>>(){Tuple.Create(1, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now)}),
-    Tuple.Create(3, "žiro", 2.0, new List<Tuple<int, double, string, string, string, DateTime>>(){Tuple.Create(1, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now)}),
-    Tuple.Create(3, "tekući", -200.0, new List<Tuple<int, double, string, string, string, DateTime>>(){Tuple.Create(1, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now)}),
-    Tuple.Create(3, "prepaid", -1.0, new List<Tuple<int, double, string, string, string, DateTime>>(){Tuple.Create(1, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now)})
+    Tuple.Create(3, "žiro", 0.0, new List<Tuple<int, double, string, string, string, DateTime>>(){Tuple.Create(1, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now)}),
+    Tuple.Create(3, "tekući", 100.0, new List<Tuple<int, double, string, string, string, DateTime>>(){Tuple.Create(1, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now)}),
+    Tuple.Create(3, "prepaid", 0.0, new List<Tuple<int, double, string, string, string, DateTime>>(){Tuple.Create(1, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now)})
 };
 
 
@@ -557,109 +555,6 @@ static string HandleTransactionOptions(string option, Tuple<int, string, double,
     }
 }
 
-static string PrintAverageForSelectedCategory(List<Tuple<int, double, string, string, string, DateTime>> transactionList) // solved
-{
-    Console.Clear();
-    Console.WriteLine("\n Odaberite kategoriju:\n\ta) plaća\n\tb) honorar\n\tc) poklon\n\td) hrana\n\te) prijevoz\n\tf) sport");
-
-    Console.Write("\n\n Vaš odabir: ");
-
-    var option = Console.ReadLine() switch
-    {
-        "a" => "plaća",
-        "b" => "honorar",
-        "c" => "poklon",
-        "d" => "hrana",
-        "e" => "prijevoz",
-        "f" => "sport",
-        _ => " Izlaz"
-    };
-
-    if (option == " Izlaz")
-        return option;
-
-    return "\n Prosjek transakcija odabrane kategorije iznosi: " + transactionList.Where(x => x.Item5 == option).Select(x => x.Item2).Average().ToString() + "\n";
-
-}
-
-static string PrintAverageForSelectedMonth(List<Tuple<int, double, string, string, string, DateTime>> transactionList) // solved
-{
-    Console.Clear();
-    Console.Write("\n Upišite mjesec i godinu u formatu mm yyyy:");
-
-    var input = Console.ReadLine();
-
-    if (input == null)
-        return "Greška!";
-    var month = 0;
-    var year = 0;
-    try
-    {
-        var splitted = input.Split();
-        month = int.Parse(splitted[0]);
-        year = int.Parse(splitted[1]);
-
-        if (month < 1 || month > 12 || year < 1 || year > DateTime.UtcNow.Year)
-            return "\n Greška!\n Mjesec koji ste odabrali nije važeći!\n";
-    }
-    catch
-    {
-        return "Greška!";
-    }
-
-
-    var selectedTransactions = transactionList.Where(x => x.Item6.Month == month && x.Item6.Year == year);
-
-    return selectedTransactions.Any() ?$"\n Prosjek za mjesec {month}/{year}: {transactionList.Where(x => x.Item6.Month == month && x.Item6.Year == year).Select(x => x.Item2).Average().ToString()}\n" : $"\n Za mjesec {month}/{year} nema nikakvih transakcija.\n";
-}
-
-static string PrintCategoryPercentage(List<Tuple<int, double, string, string, string, DateTime>> transactionList) // solving now
-{
-    Console.Clear();
-    Console.Write("\n Upišite mjesec i godinu u formatu mm yyyy:");
-
-    var input = Console.ReadLine();
-
-    if (input == null)
-        return "Greška!";
-    var month = 0;
-    var year = 0;
-    try
-    {
-        var splitted = input.Split();
-        month = int.Parse(splitted[0]);
-        year = int.Parse(splitted[1]);
-
-        if (month < 1 || month > 12 || year < 1 || year > DateTime.UtcNow.Year)
-            return "\n Greška!\n Mjesec koji ste odabrali nije važeći!\n";
-    }
-    catch
-    {
-        return "Greška!";
-    }
-
-
-    var selectedTransactions = transactionList.Where(x => x.Item6.Month == month && x.Item6.Year == year);
-
-    return selectedTransactions.Any() ? $"\n Prosjek za mjesec {month}/{year}: {transactionList.Where(x => x.Item6.Month == month && x.Item6.Year == year).Select(x => x.Item2).Average().ToString()}\n" : $"\n Za mjesec {month}/{year} nema nikakvih transakcija.\n";
-}
-
-static string PrintIncomesAndOutcomesOfSelectedMonth(List<Tuple<int, double, string, string, string, DateTime>> transactionList)
-{
-    throw new NotImplementedException();
-}
-
-static string PrintTransactionCount(List<Tuple<int, double, string, string, string, DateTime>> transactionList)
-{
-    throw new NotImplementedException();
-}
-
-static string PrintAccountBallance(Tuple<int, string, double, List<Tuple<int, double, string, string, string, DateTime>>> accountData)
-{
-    throw new NotImplementedException();
-}
-
-
 // Transactions printout methods
 
 static string PrintAllTransactionsSelectedCategoryAndType(List<Tuple<int, double, string, string, string, DateTime>> transactionList)
@@ -853,13 +748,158 @@ static string PrintAllTransactions(List<Tuple<int, double, string, string, strin
 
 // Financial report
 
-
 static void PrintReportOptions()
 {
     Console.WriteLine("\n OPCIJE FINANCIJSKOG IZVJEŠĆA\n\n a) trenutno stanje računa\n b) broj ukupnih transakcija\n c) ukupan iznos prihoda i rashoda za odabrani mjesec i godinu");
     Console.WriteLine(" d) postotak udjela rashoda za odabranu kategoriju\n e) prosječni iznos transakcije za odabrani mjesec i godinu\n f) prosječni iznos transakcije za odabranu kategoriju");
     Console.Write("\n Vaš odabir: ");
 }
+
+static string PrintAverageForSelectedCategory(List<Tuple<int, double, string, string, string, DateTime>> transactionList) // solved
+{
+    Console.Clear();
+    Console.WriteLine("\n Odaberite kategoriju:\n\ta) plaća\n\tb) honorar\n\tc) poklon\n\td) hrana\n\te) prijevoz\n\tf) sport");
+
+    Console.Write("\n\n Vaš odabir: ");
+
+    var option = Console.ReadLine() switch
+    {
+        "a" => "plaća",
+        "b" => "honorar",
+        "c" => "poklon",
+        "d" => "hrana",
+        "e" => "prijevoz",
+        "f" => "sport",
+        _ => " Izlaz"
+    };
+
+    if (option == " Izlaz")
+        return option;
+
+    var selectedTransactions = transactionList.Where(x => x.Item5 == option);
+
+    return selectedTransactions.Any() ? "\n Prosjek transakcija odabrane kategorije iznosi: " + transactionList.Where(x => x.Item5 == option).Select(x => x.Item2).Average().ToString() + "\n" : "\n Ne postoji ni jedna takva transakcija!\n";
+
+}
+
+static string PrintAverageForSelectedMonth(List<Tuple<int, double, string, string, string, DateTime>> transactionList) // solved
+{
+    Console.Clear();
+    Console.Write("\n Upišite mjesec i godinu u formatu mm yyyy:");
+
+    var input = Console.ReadLine();
+
+    if (input == null)
+        return "Greška!";
+    var month = 0;
+    var year = 0;
+    try
+    {
+        var splitted = input.Split();
+        month = int.Parse(splitted[0]);
+        year = int.Parse(splitted[1]);
+
+        if (month < 1 || month > 12 || year < 1 || year > DateTime.UtcNow.Year)
+            return "\n Greška!\n Mjesec koji ste odabrali nije važeći!\n";
+    }
+    catch
+    {
+        return "Greška!";
+    }
+
+
+    var selectedTransactions = transactionList.Where(x => x.Item6.Month == month && x.Item6.Year == year);
+
+    return selectedTransactions.Any() ? $"\n Prosjek za mjesec {month}/{year}: {transactionList.Where(x => x.Item6.Month == month && x.Item6.Year == year).Select(x => x.Item2).Average().ToString()}\n" : $"\n Za mjesec {month}/{year} nema nikakvih transakcija.\n";
+}
+
+static string PrintCategoryPercentage(List<Tuple<int, double, string, string, string, DateTime>> transactionList) // solving now
+{
+    Console.Clear();
+    Console.WriteLine("\n Odaberite kategoriju:\n\ta) plaća\n\tb) honorar\n\tc) poklon\n\td) hrana\n\te) prijevoz\n\tf) sport");
+
+    Console.Write("\n\n Vaš odabir: ");
+
+    var option = Console.ReadLine() switch
+    {
+        "a" => "plaća",
+        "b" => "honorar",
+        "c" => "poklon",
+        "d" => "hrana",
+        "e" => "prijevoz",
+        "f" => "sport",
+        _ => " Izlaz"
+    };
+
+    if (option == " Izlaz")
+        return option;
+
+    return transactionList.Count != 0 ? $"\n Postotak transakcija odabrane kategorije iznosi: {transactionList.Where(x => x.Item5 == option).Count() * 100 / (double)transactionList.Count} %\n" : "\n Na ovome računu nema transakcija.\n";
+}
+
+static string PrintIncomesAndOutcomesOfSelectedMonth(List<Tuple<int, double, string, string, string, DateTime>> transactionList)
+{
+    Console.Clear();
+    Console.Write("\n Upišite mjesec i godinu u formatu mm yyyy:");
+
+    var input = Console.ReadLine();
+
+    if (input == null)
+        return "Greška!";
+    var month = 0;
+    var year = 0;
+    try
+    {
+        var splitted = input.Split();
+        month = int.Parse(splitted[0]);
+        year = int.Parse(splitted[1]);
+
+        if (month < 1 || month > 12 || year < 1 || year > DateTime.UtcNow.Year)
+            return "\n Greška!\n Mjesec koji ste odabrali nije važeći!\n";
+    }
+    catch
+    {
+        return "Greška!";
+    }
+
+
+    var selectedTransactions = transactionList.Where(x => x.Item6.Month == month && x.Item6.Year == year);
+
+    if (!selectedTransactions.Any())
+        return $"\n Za mjesec {month}/{year} nema nikakvih transakcija.\n";
+
+    var incomes = selectedTransactions.Where(x => x.Item4 == "prihod");
+    var outcomes = selectedTransactions.Where(x => x.Item4 == "rashod");
+
+    var result = $"\n Prihodi za mjesec {month}/{year}:";
+
+    foreach (var income in incomes)
+        result += $"\n {income.Item4} - {income.Item2} - {income.Item3} - {income.Item5} - {income.Item6}";
+
+    result += $"\n\n Rashodi za mjesec {month}/{year}";
+
+    foreach (var outcome in outcomes)
+        result += $"\n {outcome.Item4} - {outcome.Item2} - {outcome.Item3} - {outcome.Item5} - {outcome.Item6}";
+
+    return result += "\n";
+}
+
+static string PrintTransactionCount(List<Tuple<int, double, string, string, string, DateTime>> transactionList)
+{
+    return $" Broj transakcija: {transactionList.Count}";
+}
+
+static string PrintAccountBallance(Tuple<int, string, double, List<Tuple<int, double, string, string, string, DateTime>>> accountData)
+{
+    var balance = accountData.Item3;
+
+    foreach (var transaction in accountData.Item4)
+        balance += transaction.Item4 == "prihod" ? transaction.Item2 : -transaction.Item2;
+
+    return balance < 0 ? $"\n Stanje računa je: {balance} EUR\n\n Upozorenje!\n \n Ovaj račun je u minusu!\n" : $"\n Stanje računa je: {balance} EUR\n";
+
+}
+
 
 // Start of program
 
