@@ -511,7 +511,18 @@ static string HandleTransactionOptions(string option, Tuple<int, string, double,
 {
     switch (option)
     {   
-        case "1": throw new NotImplementedException(); // new transaction 
+        case "1": // new transaction 
+            Console.Clear();
+            Console.WriteLine("\n STVARANJE NOVE TRANSAKCIJE\n\n a) trenutno izvršena transakcija\n b) ranije izvršena transakcija");
+            var newTransactionType = Console.ReadLine();
+            if (newTransactionType == null) return " Greška!";
+            var newTransactionResult = newTransactionType switch
+            {
+                "a" => NewCurrentTimeTransaction(false, accountData, ref accounts), // current time transaction
+                "b" => NewPastTimeTransaction(false, accountData, ref accounts), // earlier transaction
+                _ => " Izlaz"
+            };
+            return newTransactionResult;
         case "2": throw new NotImplementedException(); // delete transaction
         case "3": throw new NotImplementedException(); // edit transaction
         case "4":  // view transactions
@@ -554,6 +565,148 @@ static string HandleTransactionOptions(string option, Tuple<int, string, double,
         default: return " Greška!";
     }
 }
+
+//Create transaction
+
+static string NewPastTimeTransaction(bool error, Tuple<int, string, double, List<Tuple<int, double, string, string, string, DateTime>>> accountData, ref List<Tuple<int, string, double, List<Tuple<int, double, string, string, string, DateTime>>>> accounts)
+{
+    Console.Clear();
+    Console.WriteLine("\n UNOS PODATAKA ZA NOVU TRANSAKCIJU\n");
+
+    if (error)
+        Console.WriteLine(" Greška pri unosu podataka! Pokušajte ponovo.\n");
+
+    Console.Write(" Unesite iznos transakcije: ");
+    if (!double.TryParse(Console.ReadLine(), out var value) || value < 0)
+        return NewCurrentTimeTransaction(true, accountData, ref accounts);
+
+    Console.Write("\n Unesite opis transakcije ili ostavite prazno: ");
+    var description = Console.ReadLine();
+    if (description == null)
+        return " Greška!";
+
+    Console.WriteLine("\n a) prihod\n b) rashod\n");
+    Console.Write(" Vaš odabir: ");
+    var transactionTypeInput = Console.ReadLine();
+    var transactionType = transactionTypeInput switch
+    {
+        "a" => "prihod",
+        "b" => "rashod",
+        _ => null
+    };
+
+    if (transactionType == null)
+        return NewCurrentTimeTransaction(true, accountData, ref accounts);
+
+    Console.WriteLine(transactionType == "prihod"
+        ? "\n a) plaća\n b) honorar\n c) poklon\n"
+        : "\n d) hrana\n e) prijevoz\n f) sport\n");
+
+    Console.Write(" Vaš odabir: ");
+    var categoryInput = Console.ReadLine();
+    var category = categoryInput switch
+    {
+        "a" => "plaća",
+        "b" => "honorar",
+        "c" => "poklon",
+        "d" => "hrana",
+        "e" => "prijevoz",
+        "f" => "sport",
+        _ => null
+    };
+
+    if (category == null ||
+        (transactionType == "prihod" && new[] { "hrana", "prijevoz", "sport" }.Contains(category)) ||
+        (transactionType == "rashod" && new[] { "plaća", "honorar", "poklon" }.Contains(category)))
+        return NewCurrentTimeTransaction(true, accountData, ref accounts);
+
+    Console.Write("\n Unesite datum transakcije (u formatu yyyy-MM-dd): ");
+    if (!DateTime.TryParse(Console.ReadLine(), out var transactionDate) || transactionDate > DateTime.Now)
+    {
+        Console.WriteLine(" Datum nije validan ili je u budućnosti!");
+        return NewCurrentTimeTransaction(true, accountData, ref accounts);
+    }
+
+    var id = accountData.Item4.Count == 0 ? accountData.Item4.Max(x => x.Item1) + 1 : 1;
+
+    var newTransaction = Tuple.Create(
+        id,
+        value,
+        string.IsNullOrWhiteSpace(description) ? "standardna transakcija" : description,
+        transactionType,
+        category,
+        transactionDate);
+
+    accountData.Item4.Add(newTransaction);
+
+    return "\n Transakcija uspješno završena.";
+}
+
+static string NewCurrentTimeTransaction(bool error, Tuple<int, string, double, List<Tuple<int, double, string, string, string, DateTime>>> accountData, ref List<Tuple<int, string, double, List<Tuple<int, double, string, string, string, DateTime>>>> accounts)
+{
+    Console.Clear();
+    Console.WriteLine("\n UNOS PODATAKA ZA NOVU TRANSAKCIJU\n");
+
+    if (error)
+        Console.WriteLine(" Greška pri unosu podataka! Pokušajte ponovo.\n");
+
+    Console.Write(" Unesite iznos transakcije: ");
+
+    if (!double.TryParse(Console.ReadLine(), out var value) || value < 0)
+        return NewCurrentTimeTransaction(true, accountData, ref accounts);
+
+    Console.Write("\n Unesite opis transakcije ili ostavite prazno: ");
+    var description = Console.ReadLine();
+
+    if (description == null)
+        return " Greška!";
+
+    Console.WriteLine("\n a) prihod\n b) rashod\n");
+    Console.Write(" Vaš odabir: ");
+    var transactionTypeInput = Console.ReadLine();
+    var transactionType = transactionTypeInput switch
+    {
+        "a" => "prihod",
+        "b" => "rashod",
+        _ => null
+    };
+
+    if (transactionType == null)
+        return NewCurrentTimeTransaction(true, accountData, ref accounts);
+
+    Console.WriteLine(transactionType == "prihod"
+        ? "\n a) plaća\n b) honorar\n c) poklon\n"
+        : "\n d) hrana\n e) prijevoz\n f) sport\n");
+
+    Console.Write(" Vaš odabir: ");
+    var categoryInput = Console.ReadLine();
+    var category = categoryInput switch
+    {
+        "a" => "plaća",
+        "b" => "honorar",
+        "c" => "poklon",
+        "d" => "hrana",
+        "e" => "prijevoz",
+        "f" => "sport",
+        _ => null
+    };
+
+    // check if income is really an income
+
+    if (category == null ||
+        (transactionType == "prihod" && new[] { "hrana", "prijevoz", "sport" }.Contains(category)) ||
+        (transactionType == "rashod" && new[] { "plaća", "honorar", "poklon" }.Contains(category)))
+        return NewCurrentTimeTransaction(true, accountData, ref accounts);
+
+    var id = accountData.Item4.Count == 0 ? accountData.Item4.Max(x => x.Item1) + 1 : 1;
+
+    var newTransaction = Tuple.Create(id, value, string.IsNullOrWhiteSpace(description) ? "standardna transakcija" : description, transactionType, category, DateTime.Now);
+    
+    accountData.Item4.Add(newTransaction);
+
+    return "\n Transakcija uspješno završena.";
+}
+
 
 // Transactions printout methods
 
@@ -810,7 +963,7 @@ static string PrintAverageForSelectedMonth(List<Tuple<int, double, string, strin
 
     var selectedTransactions = transactionList.Where(x => x.Item6.Month == month && x.Item6.Year == year);
 
-    return selectedTransactions.Any() ? $"\n Prosjek za mjesec {month}/{year}: {transactionList.Where(x => x.Item6.Month == month && x.Item6.Year == year).Select(x => x.Item2).Average().ToString()}\n" : $"\n Za mjesec {month}/{year} nema nikakvih transakcija.\n";
+    return selectedTransactions.Any() ? $"\n Prosjek za mjesec {month}/{year}: {transactionList.Where(x => x.Item6.Month == month && x.Item6.Year == year).Select(x => x.Item2).Average()}\n" : $"\n Za mjesec {month}/{year} nema nikakvih transakcija.\n";
 }
 
 static string PrintCategoryPercentage(List<Tuple<int, double, string, string, string, DateTime>> transactionList) // solving now
