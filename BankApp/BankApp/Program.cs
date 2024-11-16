@@ -924,7 +924,7 @@ static string NewPastTimeTransaction(bool error, Tuple<int, string, double, List
         return NewCurrentTimeTransaction(true, accountData, ref accounts);
     }
 
-    var id = accountData.Item4.Count == 0 ? accountData.Item4.Max(x => x.Item1) + 1 : 1;
+    var id = accountData.Item4.Count > 0 ? accountData.Item4.Max(x => x.Item1) + 1 : 1;
 
     var newTransaction = Tuple.Create(
         id,
