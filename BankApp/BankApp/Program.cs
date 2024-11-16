@@ -1,6 +1,8 @@
 ﻿
 // test user list
 
+using System.Reflection.Metadata.Ecma335;
+
 var users = new List<Tuple<int, string, string, DateTime>>() // USER -> Tuple(int ID, string Name, string Surname, DateTime birthday)
 {
     Tuple.Create(1, "A"/*nte"*/, "A"/*ntić"*/, new DateTime(2001,09,21)),
@@ -145,7 +147,7 @@ static void PrintMainMenu(bool error) // Prints out Main menu text
     if (error)
         Console.WriteLine(" Pogrešno upisan odabir!");
 
-    Console.WriteLine("\n GLAVNI IZBORNIK\n\n 1 - Korisnici\n 2 - Računi\n 3 - Izlaz iz aplikacije");
+    Console.WriteLine("\n GLAVNI IZBORNIK\n\n 1 - Korisnici\n 2 - Računi\n 3 - Interni prijenos\n 4 - Eksterni prijenos\n 5 - Izlaz iz aplikacije");
     Console.Write("\n\n Vaš odabir: ");
 }
 
@@ -172,6 +174,22 @@ static void MainMenu(bool error, ref List<Tuple<int, string, string, DateTime>> 
                 Console.ReadKey();
                 break;
             case "3":
+                Console.Clear();
+                var internalTransactionSuccess = InternalTransactionController(ref users, ref accounts);
+                Console.Clear();
+                Console.WriteLine(internalTransactionSuccess);
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
+                break;
+            case "4":
+                Console.Clear();
+                var externalTransactionSuccess = ExternalTransactionController(ref users, ref accounts);
+                Console.Clear();
+                Console.WriteLine(externalTransactionSuccess);
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
+                break;
+            case "5":
                 Console.Clear();
                 Console.WriteLine(" Napustili ste aplikaciju.");
                 exit = true;
@@ -1434,6 +1452,90 @@ static string PrintAccountBalance(Tuple<int, string, double, List<Tuple<int, dou
 }
 
 // Bonus tasks:
+
+
+static string InternalTransactionController(ref List<Tuple<int, string, string, DateTime>> users, ref List<Tuple<int, string, double, List<Tuple<int, double, string, string, string, DateTime>>>> accounts)
+{
+    
+
+    Console.WriteLine("\n INTERNI PRIJENOS\n\n ");
+    Console.Write("Unesite ID korisnika: ");
+
+    var userIdInput = Console.ReadLine();
+    if (userIdInput == null)
+        return "Greška!";
+    try
+    {
+        var userId = Int32.Parse(userIdInput);
+
+        if (userId < 0)
+            return " ID ne smije biti negativan!";
+        var user = users.Find(x => x.Item1 == userId);
+        
+        if (user == null)
+            return "Korisnik ne postoji!";
+
+        Console.WriteLine("Odaberite izvorišni račun: \n a) tekući\n b) žiro\n c) prepaid");
+        Console.Write("\n Vaš odabir: ");
+
+        var sourceAccountInput = Console.ReadLine();
+        var sourceAccount = sourceAccountInput switch
+        {
+            "a" => "tekući",
+            "b" => "žiro",
+            "c" => "prepaid",
+            _ => null
+        };
+
+        Console.WriteLine("Odaberite odredišni račun: \n a) tekući\n b) žiro\n c) prepaid");
+        Console.Write("\n Vaš odabir: ");
+
+        if (sourceAccount == null)
+            return " Izlaz";
+
+        var destinationAccountInput = Console.ReadLine();
+        var destinationAccount = destinationAccountInput switch
+        {
+            "a" => "tekući",
+            "b" => "žiro",
+            "c" => "prepaid",
+            _ => null
+        };
+
+        if (destinationAccount == null)
+            return " Izlaz";
+
+        if (sourceAccount == destinationAccount)
+            return "Greška! Odredišni račun ne može biti isti kao i izvorišni!";
+
+        Console.Write("\n Unesite iznos: ");
+        var valueInput = Console.ReadLine();
+        if (valueInput == null)
+            return "Greška";
+        
+        var value = double.Parse(valueInput);
+
+        var sourceData = accounts.Find(x => x.Item2 == sourceAccount);
+        var destinationData = accounts.Find(x => x.Item2 == destinationAccount);
+
+        if (sourceData == null || destinationData == null)
+            return "Greška!";
+
+        accounts[accounts.IndexOf(sourceData)].Item4.Add(Tuple.Create(sourceData.Item4.Count == 0 ? 1 : sourceData.Item4.Max(x => x.Item1) + 1, value, $"Interni prijenos na {destinationAccount} račun", "rashod", "interni prijenos", DateTime.Now));
+        accounts[accounts.IndexOf(destinationData)].Item4.Add(Tuple.Create(destinationData.Item4.Count == 0 ? 1 : destinationData.Item4.Max(x => x.Item1) + 1, value, $"Interni prijenos, izvor: {destinationAccount} račun", "prihod", "interni prijenos", DateTime.Now));
+
+        return $" Uspješno ste prebacili {value} EUR sa {sourceAccount} na {destinationAccount}";
+    }
+    catch
+    {
+        return "Greška!";
+    }
+}
+
+static string ExternalTransactionController(ref List<Tuple<int, string, string, DateTime>> users, ref List<Tuple<int, string, double, List<Tuple<int, double, string, string, string, DateTime>>>> accounts)
+{
+    throw new NotImplementedException();
+}
 
 // Start of program
 
