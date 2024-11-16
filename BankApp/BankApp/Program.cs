@@ -5,31 +5,139 @@ var users = new List<Tuple<int, string, string, DateTime>>() // USER -> Tuple(in
 {
     Tuple.Create(1, "A"/*nte"*/, "A"/*ntić"*/, new DateTime(2001,09,21)),
     Tuple.Create(2, "Pero", "Perić", new DateTime(1999,10,22)),
-    Tuple.Create(3, "Karlo", "Ima vise od 30", new DateTime(1973,12,24))
+    Tuple.Create(3, "Karlo", "Ima vise od 30", new DateTime(1973,12,24)),
+    Tuple.Create(5, "Maja", "Horvat", new DateTime(1993, 3, 10)),
+    Tuple.Create(6, "Ivan", "Babić", new DateTime(1998, 8, 22)),
+    Tuple.Create(7, "Lucija", "Petrović", new DateTime(1997, 12, 5)),
+    Tuple.Create(8, "David", "Matić", new DateTime(2001, 1, 17))
+
 };
 
 
 //test account list
 
-var accounts = new List<Tuple<int, string, double, List<Tuple<int, double, string, string, string, DateTime>>>>() // ACCOUNT -> Tuple(int UserID, string accountType, double balance, List of transactions(Tuple(id transactionID, double Value, string description, string Type, string category, DateTime time)))
+var accounts = new List<Tuple<int, string, double, List<Tuple<int, double, string, string, string, DateTime>>>>()
 {
-    Tuple.Create(1, "žiro", 0.0, new List<Tuple<int, double, string, string, string, DateTime>>(){Tuple.Create(1, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now)}),
-    Tuple.Create(1, "tekući", 100.0, new List<Tuple<int, double, string, string, string, DateTime>>()
+    // Account for user 1
+    Tuple.Create(1, "žiro", 50.0, new List<Tuple<int, double, string, string, string, DateTime>>()
+    {
+        Tuple.Create(1, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now)
+    }),
+
+    Tuple.Create(1, "tekući", 200.0, new List<Tuple<int, double, string, string, string, DateTime>>()
     {
         Tuple.Create(1, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now),
-        Tuple.Create(2, 8.1, "standardna transakcija", "prihod", "plaća", DateTime.Now),
-        Tuple.Create(3, 400.0, "standardna transakcija", "rashod", "prijevoz", DateTime.Now),
-        Tuple.Create(4, 11.5, "standardna transakcija", "prihod", "plaća", DateTime.Now),
-        Tuple.Create(5, 20.1, "standardna transakcija", "prihod", "plaća", DateTime.Now)
+        Tuple.Create(2, 8.1, "standardna transakcija", "prihod", "plaća", DateTime.Now)
     }),
-    Tuple.Create(1, "prepaid", 0.0, new List<Tuple<int, double, string, string, string, DateTime>>(){Tuple.Create(1, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now)}),
-    Tuple.Create(2, "žiro", 0.0, new List<Tuple<int, double, string, string, string, DateTime>>(){Tuple.Create(2, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now)}),
-    Tuple.Create(2, "tekući", 100.0, new List<Tuple<int, double, string, string, string, DateTime>>(){Tuple.Create(3, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now)}),
-    Tuple.Create(2, "prepaid", 0.0, new List<Tuple<int, double, string, string, string, DateTime>>(){Tuple.Create(4, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now)}),
-    Tuple.Create(3, "žiro", 0.0, new List<Tuple<int, double, string, string, string, DateTime>>(){Tuple.Create(5, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now)}),
-    Tuple.Create(3, "tekući", 100.0, new List<Tuple<int, double, string, string, string, DateTime>>(){Tuple.Create(6, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now)}),
-    Tuple.Create(3, "prepaid", 0.0, new List<Tuple<int, double, string, string, string, DateTime>>(){Tuple.Create(7, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now)})
+
+    Tuple.Create(1, "prepaid", 10.0, new List<Tuple<int, double, string, string, string, DateTime>>()
+    {
+        Tuple.Create(1, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now)
+    }),
+
+    // Account for user 2
+    Tuple.Create(2, "žiro", 120.0, new List<Tuple<int, double, string, string, string, DateTime>>()
+    {
+        Tuple.Create(2, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now)
+    }),
+
+    Tuple.Create(2, "tekući", 350.0, new List<Tuple<int, double, string, string, string, DateTime>>()
+    {
+        Tuple.Create(3, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now),
+        Tuple.Create(4, 4.90, "standardna transakcija", "rashod", "prijevoz", DateTime.Now)
+    }),
+
+    Tuple.Create(2, "prepaid", 5.0, new List<Tuple<int, double, string, string, string, DateTime>>()
+    {
+        Tuple.Create(4, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now)
+    }),
+
+    // Account for user 3
+    Tuple.Create(3, "žiro", 200.0, new List<Tuple<int, double, string, string, string, DateTime>>()
+    {
+        Tuple.Create(5, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now)
+    }),
+
+    Tuple.Create(3, "tekući", 400.0, new List<Tuple<int, double, string, string, string, DateTime>>()
+    {
+        Tuple.Create(6, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now),
+        Tuple.Create(7, 4.90, "standardna transakcija", "rashod", "hrana", DateTime.Now)
+    }),
+
+    Tuple.Create(3, "prepaid", 20.0, new List<Tuple<int, double, string, string, string, DateTime>>()
+    {
+        Tuple.Create(7, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now)
+    }),
+
+    // Account for user 5
+    Tuple.Create(5, "žiro", 500.0, new List<Tuple<int, double, string, string, string, DateTime>>()
+    {
+        Tuple.Create(8, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now)
+    }),
+
+    Tuple.Create(5, "tekući", 700.0, new List<Tuple<int, double, string, string, string, DateTime>>()
+    {
+        Tuple.Create(9, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now),
+        Tuple.Create(10, 4.90, "standardna transakcija", "rashod", "prijevoz", DateTime.Now)
+    }),
+
+    Tuple.Create(5, "prepaid", 15.0, new List<Tuple<int, double, string, string, string, DateTime>>()
+    {
+        Tuple.Create(10, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now)
+    }),
+
+    // Account for user 6
+    Tuple.Create(6, "žiro", 300.0, new List<Tuple<int, double, string, string, string, DateTime>>()
+    {
+        Tuple.Create(11, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now)
+    }),
+
+    Tuple.Create(6, "tekući", 500.0, new List<Tuple<int, double, string, string, string, DateTime>>()
+    {
+        Tuple.Create(12, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now),
+        Tuple.Create(13, 4.90, "standardna transakcija", "rashod", "sport", DateTime.Now)
+    }),
+
+    Tuple.Create(6, "prepaid", 8.0, new List<Tuple<int, double, string, string, string, DateTime>>()
+    {
+        Tuple.Create(13, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now)
+    }),
+
+    // Account for user 7
+    Tuple.Create(7, "žiro", 400.0, new List<Tuple<int, double, string, string, string, DateTime>>()
+    {
+        Tuple.Create(14, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now)
+    }),
+
+    Tuple.Create(7, "tekući", 600.0, new List<Tuple<int, double, string, string, string, DateTime>>()
+    {
+        Tuple.Create(15, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now),
+        Tuple.Create(16, 4.90, "standardna transakcija", "rashod", "hrana", DateTime.Now)
+    }),
+
+    Tuple.Create(7, "prepaid", 25.0, new List<Tuple<int, double, string, string, string, DateTime>>()
+    {
+        Tuple.Create(16, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now)
+    }),
+
+    // Account for user 8
+    Tuple.Create(8, "žiro", 300.0, new List<Tuple<int, double, string, string, string, DateTime>>()
+    {
+        Tuple.Create(17, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now)
+    }),
+
+    Tuple.Create(8, "tekući", 550.0, new List<Tuple<int, double, string, string, string, DateTime>>()
+    {
+        Tuple.Create(18, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now),
+        Tuple.Create(19, 4.90, "standardna transakcija", "rashod", "sport", DateTime.Now)
+    }),
+
+    Tuple.Create(8, "prepaid", 30.0, new List<Tuple<int, double, string, string, string, DateTime>>()
+    {
+        Tuple.Create(19, 4.90, "standardna transakcija", "prihod", "plaća", DateTime.Now)
+    })
 };
+
 
 
 // Main menu
@@ -213,9 +321,7 @@ static void PrintUsersInMinus(List<Tuple<int, string, string, DateTime>> users, 
 
         if (user != null)
             Console.WriteLine($" {user.Item1} - {user.Item2} - {user.Item3} - {user.Item4:dd/MM/yyyy}");
-
     }
-
 }
 
 // User insertion
@@ -264,7 +370,6 @@ static string UserCreateDialogue(ref List<Tuple<int, string, string, DateTime>> 
     {
         return "Pogreška pri upisu podataka!\n\n " + ex.Message;
     }
-
 }
 
 // Delete user
@@ -1353,6 +1458,11 @@ static string PrintAccountBalance(Tuple<int, string, double, List<Tuple<int, dou
     return balance < 0 ? $"\n Stanje računa je: {balance} EUR\n\n Upozorenje!\n \n Ovaj račun je u minusu!\n" : $"\n Stanje računa je: {balance} EUR\n";
 
 }
+
+// Bonus tasks
+
+
+
 
 // Start of program
 
