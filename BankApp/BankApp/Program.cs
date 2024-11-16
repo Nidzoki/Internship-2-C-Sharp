@@ -45,37 +45,41 @@ static void PrintMainMenu(bool error) // Prints out Main menu text
 
 }
 
-static void MainMenu(bool error, ref List<Tuple<int, string, string, DateTime>> users, ref List<Tuple<int, string, double, List<Tuple<int, double, string, string, string, DateTime>>>> accounts) // Main menu controller
+static void MainMenu(bool error, ref List<Tuple<int, string, string, DateTime>> users, ref List<Tuple<int, string, double, List<Tuple<int, double, string, string, string, DateTime>>>> accounts)
 {
-    PrintMainMenu(error);
-
-    var option = Console.ReadLine();
-
-    switch (option)
+    bool exit = false;
+    while (!exit)
     {
-        case "1":
-            Console.Clear();
-            UserMenu(false, ref users, ref accounts);
-            MainMenu(false, ref users, ref accounts);
-            break;
-        case "2":
-            Console.Clear();
-            var accountSuccess = AccountMenuController(ref users, ref accounts);
-            Console.Clear();
-            Console.WriteLine(accountSuccess);
-            Console.Write(" Press any key to continue...");
-            Console.ReadKey();
-            MainMenu(false, ref users, ref accounts);
-            break;
-        case "3":
-            Console.Clear();
-            Console.WriteLine(" Napustili ste aplikaciju.");
-            break;
-        default:
-            MainMenu(true, ref users, ref accounts);
-            break;
+        PrintMainMenu(error);
+        var option = Console.ReadLine();
+
+        switch (option)
+        {
+            case "1":
+                Console.Clear();
+                UserMenu(false, ref users, ref accounts);
+                break;
+            case "2":
+                Console.Clear();
+                var accountSuccess = AccountMenuController(ref users, ref accounts);
+                Console.Clear();
+                Console.WriteLine(accountSuccess);
+                Console.Write(" Press any key to continue...");
+                Console.ReadKey();
+                break;
+            case "3":
+                Console.Clear();
+                Console.WriteLine(" Napustili ste aplikaciju.");
+                exit = true;
+                break;
+            default:
+                Console.Clear();
+                MainMenu(true, ref users, ref accounts);
+                break;
+        }
     }
 }
+
 
 
 // User menu
@@ -245,6 +249,10 @@ static string UserCreateDialogue(ref List<Tuple<int, string, string, DateTime>> 
         if (!users.Any(x => x.Item1 == newUser.Item1)) // check if user id is taken
         {
             users.Add(newUser);
+            accounts.Add(Tuple.Create(newUser.Item1, "tekući", 100.0, new List<Tuple<int, double, string, string, string, DateTime>>()));
+            accounts.Add(Tuple.Create(newUser.Item1, "žiro", 0.0, new List<Tuple<int, double, string, string, string, DateTime>>()));
+            accounts.Add(Tuple.Create(newUser.Item1, "prepaid", 0.0, new List<Tuple<int, double, string, string, string, DateTime>>()));
+
             return "Korisnik uspješno dodan!";
         }
         else
@@ -289,28 +297,30 @@ static string DeleteUserById(bool error, ref List<Tuple<int, string, string, Dat
     Console.Clear();
     Console.WriteLine("\n BRISANJE KORISNIKA PO ID-u\n\n");
     if (error)
-        Console.WriteLine("Pogreška pri unosu!\n");
-    Console.Write("\nUnesite ID za brisanje ili x za izlaz: ");
+        Console.WriteLine(" Pogreška pri unosu!\n");
+    Console.Write("\n Unesite ID za brisanje ili x za izlaz: ");
 
     var input = Console.ReadLine();
 
     if (input == null)
-        return "Greška!";
+        return " Greška!";
 
     if (input == "x")
-        return "Izlaz iz brisanja korisnika.";
+        return " Izlaz iz brisanja korisnika.";
 
     try
     {
         var id = Int32.Parse(input);
 
         if (id < 0)
-            throw new Exception("ID ne smije biti manji od 0!");
+            throw new Exception(" ID ne smije biti manji od 0!");
 
         if (users.RemoveAll(x => x.Item1 == id) == 0)
-            throw new Exception("Korisnik sa unesenim ID-om ne postoji");
+            throw new Exception(" Korisnik sa unesenim ID-om ne postoji");
 
-        return "Korisnik uspješno izbrisan!";
+        accounts.RemoveAll(x => x.Item1 == id);
+
+        return " Korisnik uspješno izbrisan!";
     }
     catch (Exception ex)
     {
@@ -340,9 +350,13 @@ static string DeleteUserByNameAndSurname(bool error, ref List<Tuple<int, string,
 
         if (strings.Length != 2)
             throw new Exception("Netočan format unosa!");
+        
+        var userId = users.Where(x => x.Item2 == strings[0] && x.Item3 == strings[1]).Select(x => x.Item1).FirstOrDefault(0);
 
         if (users.RemoveAll(x => x.Item2 == strings[0] && x.Item3 == strings[1]) == 0)
             throw new Exception("Korisnik sa unesenim imenom i prezimenom ne postoji");
+
+        accounts.RemoveAll(x => x.Item1 == userId);
 
         return "Korisnik uspješno izbrisan!";
     }
@@ -371,10 +385,9 @@ static string EditUserDialogue(ref List<Tuple<int, string, string, DateTime>> us
         if (id < 0)
             throw new Exception("ID ne smije biti negativan!");
 
-        if (!users.Any(x => x.Item1 == id))
-            throw new Exception("Korisnik ne postoji!");
+        var user = users.Find(x => x.Item1 == id) ?? throw new Exception("Korisnik ne postoji!");
 
-        Console.WriteLine("\n Podaci odabranog korisnika: " + users.Find(x => x.Item1 == id));
+        Console.WriteLine($"\n Odabran je korisnik:\n Ime: {user.Item2} Prezime: {user.Item3} Datum rođenja: {user.Item4.Date.Day}/{user.Item4.Date.Month}/{user.Item4.Date.Year}");
         Console.WriteLine("\n Upišite podatke o korisniku u formatu: IME PREZIME DATUM_ROĐENJA\n\n Napomena: Datum rođenja unijeti u formatu dd/MM/yyyy\n\n Unesite \"x\" za izlaz");
         Console.Write("\n Vaš unos: ");
 
@@ -410,7 +423,6 @@ static void PrintTransactionOptions()
     Console.WriteLine("\n OPCIJE TRANSAKCIJA\n\n 1 - Unos nove transakcije\n 2 - Brisanje transakcije\n 3 - Uređivanje transakcije\n 4 - Pregled transakcija\n 5 - Financijsko izvješće\n 0 - Izlaz");
     Console.Write("\n\n Vaš odabir: ");
 }
-
 
 static void PrintTransactionViewOptions()
 {
@@ -472,28 +484,42 @@ static string AccountMenuController(ref List<Tuple<int, string, string, DateTime
                 return "Greška!";
 
             Console.Clear();
-            Console.WriteLine($"\n PREGLED ODABRANOG RAČUNA\n\n Korisnik: {userData.Item2 + " " + userData.Item3}\n Tip računa: {accountDataA.Item2}{PrintAccountBalance(accountDataA)} EUR\n");
+            Console.WriteLine($"\n PREGLED ODABRANOG RAČUNA\n\n Korisnik: {userData.Item2 + " " + userData.Item3}\n Tip računa: {accountDataA.Item2}{PrintAccountBalance(accountDataA)}\n");
             PrintTransactionOptions();
 
             var optionA = Console.ReadLine();
 
             if (optionA == null) return "Greška";
-            return HandleTransactionOptions(optionA, accountDataA, ref users, ref accounts);
+            Console.Clear();
+            Console.WriteLine(HandleTransactionOptions(optionA, accountDataA, ref users, ref accounts));
+            break;
         case "b":
             var accountDataB = accounts.Find(x => x.Item1 == userData.Item1 && x.Item2 == "žiro");
             if (accountDataB == null)
                 return "Greška!";
             Console.Clear();
-            Console.WriteLine($"\n PREGLED ODABRANOG RAČUNA\n\n Korisnik: {userData.Item2 + " " + userData.Item3}\n Tip računa: {accountDataB.Item2}{PrintAccountBalance(accountDataB)} EUR\n");
+            Console.WriteLine($"\n PREGLED ODABRANOG RAČUNA\n\n Korisnik: {userData.Item2 + " " + userData.Item3}\n Tip računa: {accountDataB.Item2}{PrintAccountBalance(accountDataB)}\n");
             PrintTransactionOptions();
+
+            var optionB = Console.ReadLine();
+
+            if (optionB == null) return "Greška";
+            Console.Clear();
+            Console.WriteLine(HandleTransactionOptions(optionB, accountDataB, ref users, ref accounts));
             break;
         case "c":
             var accountDataC = accounts.Find(x => x.Item1 == userData.Item1 && x.Item2 == "prepaid");
             if (accountDataC == null)
                 return "Greška!";
             Console.Clear();
-            Console.WriteLine($"\n PREGLED ODABRANOG RAČUNA\n\n Korisnik: {userData.Item2 + " " + userData.Item3}\n Tip računa: {accountDataC.Item2}{PrintAccountBalance(accountDataC)} EUR\n");
+            Console.WriteLine($"\n PREGLED ODABRANOG RAČUNA\n\n Korisnik: {userData.Item2 + " " + userData.Item3}\n Tip računa: {accountDataC.Item2}{PrintAccountBalance(accountDataC)}\n");
             PrintTransactionOptions();
+
+            var optionC = Console.ReadLine();
+
+            if (optionC == null) return "Greška";
+            Console.Clear();
+            Console.WriteLine(HandleTransactionOptions(optionC, accountDataC, ref users, ref accounts));
 
             break;
         case "d":
@@ -539,7 +565,8 @@ static string HandleTransactionOptions(string option, Tuple<int, string, double,
                 _ => " Izlaz"
             };
             return deleteResult;
-        case "3": throw new NotImplementedException(); // edit transaction
+        case "3": // edit transaction
+            return EditTransaction(accountData, ref accounts);
         case "4":  // view transactions
             Console.Clear();
             PrintTransactionViewOptions();
@@ -580,6 +607,8 @@ static string HandleTransactionOptions(string option, Tuple<int, string, double,
         default: return " Greška!";
     }
 }
+
+// Delete transaction
 
 static string DeleteTransactionsByCategory(Tuple<int, string, double, List<Tuple<int, double, string, string, string, DateTime>>> accountData, ref List<Tuple<int, string, double, List<Tuple<int, double, string, string, string, DateTime>>>> accounts)
 {
@@ -863,7 +892,15 @@ static string NewCurrentTimeTransaction(bool error, Tuple<int, string, double, L
         (transactionType == "rashod" && new[] { "plaća", "honorar", "poklon" }.Contains(category)))
         return NewCurrentTimeTransaction(true, accountData, ref accounts);
 
-    var id = accountData.Item4.Count == 0 ? accountData.Item4.Max(x => x.Item1) + 1 : 1;
+    Console.WriteLine("\n Želite li napraviti ovu transakciju? (da/ne)");
+    var userResponse = Console.ReadLine()?.Trim().ToLower();
+
+    if (userResponse != "da")
+    {
+        return " Uređivanje transakcije otkazano.";
+    }
+
+    var id = accountData.Item4.Count == 0 ? 1 : accountData.Item4.Max(x => x.Item1) + 1;
 
     var newTransaction = Tuple.Create(id, value, string.IsNullOrWhiteSpace(description) ? "standardna transakcija" : description, transactionType, category, DateTime.Now);
 
@@ -872,6 +909,105 @@ static string NewCurrentTimeTransaction(bool error, Tuple<int, string, double, L
     return "\n Transakcija uspješno završena.";
 }
 
+// Update transaction
+
+static string EditTransaction(Tuple<int, string, double, List<Tuple<int, double, string, string, string, DateTime>>> accountData, ref List<Tuple<int, string, double, List<Tuple<int, double, string, string, string, DateTime>>>> accounts)
+{
+    Console.WriteLine("\n Popis svih transakcija:\n");
+    foreach (var t in accountData.Item4)
+    {
+        Console.WriteLine($" ID: {t.Item1}, Iznos: {t.Item2}, Opis: {t.Item3}, Kategorija: {t.Item5}, Datum: {t.Item6}");
+    }
+
+    Console.Write("\n Unesite ID transakcije koju želite urediti: ");
+    if (!int.TryParse(Console.ReadLine(), out var transactionId))
+    {
+        return " Neispravan unos ID-a. Molimo pokušajte ponovo.";
+    }
+
+    var transactionIndex = accountData.Item4.FindIndex(t => t.Item1 == transactionId);
+    if (transactionIndex == -1)
+        return " Transakcija nije pronađena.";
+
+    var selectedTransaction = accountData.Item4[transactionIndex];
+
+    Console.WriteLine("\n Što želite urediti?");
+    Console.WriteLine(" 1) Iznos");
+    Console.WriteLine(" 2) Opis");
+    Console.WriteLine(" 3) Kategorija");
+    Console.WriteLine(" 4) Datum");
+
+    Console.Write("\n Vaš odabir: ");
+    if (!int.TryParse(Console.ReadLine(), out var choice) || choice < 1 || choice > 4)
+    {
+        return " Neispravan odabir. Molimo pokušajte ponovo.";
+    }
+
+    switch (choice)
+    {
+        case 1:
+            Console.Write("\n Unesite novi iznos: ");
+            if (!double.TryParse(Console.ReadLine(), out var newAmount) || newAmount < 0)
+                return " Neispravan unos iznosa.";
+            selectedTransaction = Tuple.Create(selectedTransaction.Item1, newAmount, selectedTransaction.Item3, selectedTransaction.Item4, selectedTransaction.Item5, selectedTransaction.Item6);
+            break;
+
+        case 2:
+            Console.Write("\n Unesite novi opis: ");
+            var newDescription = Console.ReadLine();
+            if (string.IsNullOrWhiteSpace(newDescription))
+                return " Opis ne može biti prazan.";
+            selectedTransaction = Tuple.Create(selectedTransaction.Item1, selectedTransaction.Item2, newDescription, selectedTransaction.Item4, selectedTransaction.Item5, selectedTransaction.Item6);
+            break;
+
+        case 3:
+            Console.WriteLine("\n Odaberite novu kategoriju:");
+            Console.WriteLine(" a) plaća\n b) honorar\n c) poklon\n d) hrana\n e) prijevoz\n f) sport");
+            Console.Write("\n Vaš odabir: ");
+            var categoryInput = Console.ReadLine();
+            var newCategory = categoryInput switch
+            {
+                "a" => "plaća",
+                "b" => "honorar",
+                "c" => "poklon",
+                "d" => "hrana",
+                "e" => "prijevoz",
+                "f" => "sport",
+                _ => null
+            };
+            if (newCategory == null)
+                return " Neispravan unos kategorije.";
+            selectedTransaction = Tuple.Create(selectedTransaction.Item1, selectedTransaction.Item2, selectedTransaction.Item3, selectedTransaction.Item4, newCategory, selectedTransaction.Item6);
+            break;
+
+        case 4:
+            Console.Write("\n Unesite novi datum (yyyy-MM-dd): ");
+            if (!DateTime.TryParse(Console.ReadLine(), out var newDate) || newDate > DateTime.Now)
+                return " Neispravan unos datuma.";
+            selectedTransaction = Tuple.Create(selectedTransaction.Item1, selectedTransaction.Item2, selectedTransaction.Item3, selectedTransaction.Item4, selectedTransaction.Item5, newDate);
+            break;
+    }
+
+    Console.WriteLine("\n Želite li urediti ovu transakciju? (da/ne)");
+    var userResponse = Console.ReadLine()?.Trim().ToLower();
+
+    if (userResponse != "da")
+    {
+        return " Uređivanje transakcije otkazano.";
+    }
+
+    accountData.Item4[transactionIndex] = selectedTransaction;
+
+    var accountIndex = accounts.IndexOf(accountData);
+    accounts[accountIndex] = new Tuple<int, string, double, List<Tuple<int, double, string, string, string, DateTime>>>(
+        accountData.Item1,
+        accountData.Item2,
+        accountData.Item3,
+        accountData.Item4
+    );
+
+    return $" Transakcija s ID-jem {transactionId} uspješno je uređena.";
+}
 
 // Transactions printout methods
 
@@ -1217,7 +1353,6 @@ static string PrintAccountBalance(Tuple<int, string, double, List<Tuple<int, dou
     return balance < 0 ? $"\n Stanje računa je: {balance} EUR\n\n Upozorenje!\n \n Ovaj račun je u minusu!\n" : $"\n Stanje računa je: {balance} EUR\n";
 
 }
-
 
 // Start of program
 
