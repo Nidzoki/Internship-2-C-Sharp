@@ -186,7 +186,7 @@ static void MainMenu(bool error, ref List<Tuple<int, string, string, DateTime>> 
 
 // User menu
 
-static void PrintUserMenu(bool error) // Prints out user menu
+static void PrintUserMenu(bool error)
 {
     Console.Clear();
     if (error)
@@ -376,14 +376,14 @@ static string DeleteUserDialogue(bool error, ref List<Tuple<int, string, string,
 
     return input switch
     {
-        "a" => DeleteUserById(false, ref users, ref accounts),//solved
-        "b" => DeleteUserByNameAndSurname(false, ref users, ref accounts),//solved
+        "a" => DeleteUserById(false, ref users, ref accounts),
+        "b" => DeleteUserByNameAndSurname(false, ref users, ref accounts),
         "c" => "Izlaz iz brisanja korisnika...",
         _ => DeleteUserDialogue(true, ref users, ref accounts),
     };
 }
 
-static string DeleteUserById(bool error, ref List<Tuple<int, string, string, DateTime>> users, ref List<Tuple<int, string, double, List<Tuple<int, double, string, string, string, DateTime>>>> accounts) // solved, i think
+static string DeleteUserById(bool error, ref List<Tuple<int, string, string, DateTime>> users, ref List<Tuple<int, string, double, List<Tuple<int, double, string, string, string, DateTime>>>> accounts)
 {
     Console.Clear();
     Console.WriteLine("\n BRISANJE KORISNIKA PO ID-u\n\n");
@@ -419,7 +419,7 @@ static string DeleteUserById(bool error, ref List<Tuple<int, string, string, Dat
     }
 }
 
-static string DeleteUserByNameAndSurname(bool error, ref List<Tuple<int, string, string, DateTime>> users, ref List<Tuple<int, string, double, List<Tuple<int, double, string, string, string, DateTime>>>> accounts) // solved i think
+static string DeleteUserByNameAndSurname(bool error, ref List<Tuple<int, string, string, DateTime>> users, ref List<Tuple<int, string, double, List<Tuple<int, double, string, string, string, DateTime>>>> accounts)
 {
     Console.Clear();
     Console.WriteLine("\n BRISANJE KORISNIKA PO IMENU I PREZIMENU\n\n");
@@ -1433,9 +1433,7 @@ static string PrintAccountBalance(Tuple<int, string, double, List<Tuple<int, dou
 
 }
 
-// Bonus tasks
-
-
+// Bonus tasks:
 
 // Start of program
 
