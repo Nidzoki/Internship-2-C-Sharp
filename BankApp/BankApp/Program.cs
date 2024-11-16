@@ -13,7 +13,6 @@ var users = new List<Tuple<int, string, string, DateTime>>() // USER -> Tuple(in
 
 };
 
-
 //test account list
 
 var accounts = new List<Tuple<int, string, double, List<Tuple<int, double, string, string, string, DateTime>>>>()
@@ -138,8 +137,6 @@ var accounts = new List<Tuple<int, string, double, List<Tuple<int, double, strin
     })
 };
 
-
-
 // Main menu
 
 static void PrintMainMenu(bool error) // Prints out Main menu text
@@ -150,7 +147,6 @@ static void PrintMainMenu(bool error) // Prints out Main menu text
 
     Console.WriteLine("\n GLAVNI IZBORNIK\n\n 1 - Korisnici\n 2 - Računi\n 3 - Izlaz iz aplikacije");
     Console.Write("\n\n Vaš odabir: ");
-
 }
 
 static void MainMenu(bool error, ref List<Tuple<int, string, string, DateTime>> users, ref List<Tuple<int, string, double, List<Tuple<int, double, string, string, string, DateTime>>>> accounts)
@@ -188,8 +184,6 @@ static void MainMenu(bool error, ref List<Tuple<int, string, string, DateTime>> 
     }
 }
 
-
-
 // User menu
 
 static void PrintUserMenu(bool error) // Prints out user menu
@@ -216,7 +210,6 @@ static void UserMenu(bool error, ref List<Tuple<int, string, string, DateTime>> 
             Console.WriteLine("\n " + addSuccess + "\n\n Press any key to continue...");
             Console.ReadKey();
             break;
-
         case "2": // DELETE USER 
             Console.Clear();
             var deleteSuccess = DeleteUserDialogue(false, ref users, ref accounts);
@@ -224,7 +217,6 @@ static void UserMenu(bool error, ref List<Tuple<int, string, string, DateTime>> 
             Console.WriteLine("\n " + deleteSuccess + "\n\n Press any key to continue...");
             Console.ReadKey();
             break;
-
         case "3": // EDIT USER
             Console.Clear();
             var editSuccess = EditUserDialogue(ref users, ref accounts);
@@ -232,19 +224,15 @@ static void UserMenu(bool error, ref List<Tuple<int, string, string, DateTime>> 
             Console.WriteLine("\n " + editSuccess + "\n\n Press any key to continue...");
             Console.ReadKey();
             break;
-
         case "4": // PRINT USERS
             UserMenuOption(false, ref users, ref accounts);
             break;
-
         case "5": // EXIT TO MAIN MENU
             break;
-
         default:
             UserMenu(true, ref users, ref accounts);
             break;
     }
-
 }
 
 static void UserMenuOption(bool error, ref List<Tuple<int, string, string, DateTime>> users, ref List<Tuple<int, string, double, List<Tuple<int, double, string, string, string, DateTime>>>> accounts)
@@ -269,7 +257,6 @@ static void UserMenuOption(bool error, ref List<Tuple<int, string, string, DateT
             Console.ReadKey();
             UserMenu(false, ref users, ref accounts);
             break;
-
         case "b":
             Console.Clear();
             PrintUsersOverThirty(users);
@@ -377,7 +364,6 @@ static string UserCreateDialogue(ref List<Tuple<int, string, string, DateTime>> 
 static string DeleteUserDialogue(bool error, ref List<Tuple<int, string, string, DateTime>> users, ref List<Tuple<int, string, double, List<Tuple<int, double, string, string, string, DateTime>>>> accounts)
 {
     Console.Clear();
-
     Console.WriteLine("\n IZBORNIK BRISANJA KORISNIKA\n");
     if (error)
         Console.WriteLine(" Pogrešan odabir!\n");
@@ -512,14 +498,12 @@ static string EditUserDialogue(ref List<Tuple<int, string, string, DateTime>> us
         users[users.FindIndex(x => x.Item1 == id)] = Tuple.Create(id, strings[0], strings[1], DateTime.Parse(strings[2]));
 
         return "Podaci uspješno ažurirani!";
-
     }
     catch
     {
         return "Pogreška pri upisu podataka!\n\n ";
     }
 }
-
 
 // Account menu
 
@@ -565,8 +549,6 @@ static string AccountMenuController(ref List<Tuple<int, string, string, DateTime
         return "Greška!";
 
     Console.WriteLine($"\n Računi korisnika: {userData.Item2 + " " + userData.Item3}: ");
-
-
 
     foreach (var account in accounts.Where(x => x.Item1 == userData.Item1))
     {
@@ -962,6 +944,7 @@ static string NewCurrentTimeTransaction(bool error, Tuple<int, string, double, L
 
     Console.WriteLine("\n a) prihod\n b) rashod\n");
     Console.Write(" Vaš odabir: ");
+
     var transactionTypeInput = Console.ReadLine();
     var transactionType = transactionTypeInput switch
     {
@@ -991,7 +974,6 @@ static string NewCurrentTimeTransaction(bool error, Tuple<int, string, double, L
     };
 
     // check if income is really an income
-
     if (category == null ||
         (transactionType == "prihod" && new[] { "hrana", "prijevoz", "sport" }.Contains(category)) ||
         (transactionType == "rashod" && new[] { "plaća", "honorar", "poklon" }.Contains(category)))
@@ -1041,8 +1023,8 @@ static string EditTransaction(Tuple<int, string, double, List<Tuple<int, double,
     Console.WriteLine(" 2) Opis");
     Console.WriteLine(" 3) Kategorija");
     Console.WriteLine(" 4) Datum");
-
     Console.Write("\n Vaš odabir: ");
+
     if (!int.TryParse(Console.ReadLine(), out var choice) || choice < 1 || choice > 4)
     {
         return " Neispravan odabir. Molimo pokušajte ponovo.";
@@ -1120,7 +1102,6 @@ static string PrintAllTransactionsSelectedCategoryAndType(List<Tuple<int, double
 {
     Console.Clear();
     Console.WriteLine("\n Odaberite kategoriju:\n\ta) plaća\n\tb) honorar\n\tc) poklon\n\td) hrana\n\te) prijevoz\n\tf) sport");
-
     Console.Write("\n\n Vaš odabir: ");
 
     var categoryOption = Console.ReadLine() switch
@@ -1139,7 +1120,6 @@ static string PrintAllTransactionsSelectedCategoryAndType(List<Tuple<int, double
 
     Console.Clear();
     Console.WriteLine("\n Odaberite tip:\n\ta) prihod\n\tb) rashod");
-
     Console.Write("\n\n Vaš odabir: ");
 
     var typeOption = Console.ReadLine() switch
@@ -1156,7 +1136,6 @@ static string PrintAllTransactionsSelectedCategoryAndType(List<Tuple<int, double
         Console.WriteLine($" {transaction.Item4} - {transaction.Item2} - {transaction.Item3} - {transaction.Item5} - {transaction.Item6}");
 
     Console.WriteLine("\n Press any key to continue...");
-
     Console.ReadKey();
 
     return " Izlaz";
@@ -1166,7 +1145,6 @@ static string PrintAllTransactionsSelectedCategory(List<Tuple<int, double, strin
 {
     Console.Clear();
     Console.WriteLine("\n Odaberite kategoriju:\n\ta) plaća\n\tb) honorar\n\tc) poklon\n\td) hrana\n\te) prijevoz\n\tf) sport");
-
     Console.Write("\n\n Vaš odabir: ");
 
     var option = Console.ReadLine() switch
@@ -1187,7 +1165,6 @@ static string PrintAllTransactionsSelectedCategory(List<Tuple<int, double, strin
         Console.WriteLine($" {transaction.Item4} - {transaction.Item2} - {transaction.Item3} - {transaction.Item5} - {transaction.Item6}");
 
     Console.WriteLine("\n Press any key to continue...");
-
     Console.ReadKey();
 
     return " Izlaz";
@@ -1338,7 +1315,6 @@ static string PrintAverageForSelectedCategory(List<Tuple<int, double, string, st
     var selectedTransactions = transactionList.Where(x => x.Item5 == option);
 
     return selectedTransactions.Any() ? "\n Prosjek transakcija odabrane kategorije iznosi: " + transactionList.Where(x => x.Item5 == option).Select(x => x.Item2).Average().ToString() + "\n" : "\n Ne postoji ni jedna takva transakcija!\n";
-
 }
 
 static string PrintAverageForSelectedMonth(List<Tuple<int, double, string, string, string, DateTime>> transactionList) // solved
@@ -1365,7 +1341,6 @@ static string PrintAverageForSelectedMonth(List<Tuple<int, double, string, strin
     {
         return "Greška!";
     }
-
 
     var selectedTransactions = transactionList.Where(x => x.Item6.Month == month && x.Item6.Year == year);
 
@@ -1421,7 +1396,6 @@ static string PrintIncomesAndOutcomesOfSelectedMonth(List<Tuple<int, double, str
         return "Greška!";
     }
 
-
     var selectedTransactions = transactionList.Where(x => x.Item6.Month == month && x.Item6.Year == year);
 
     if (!selectedTransactions.Any())
@@ -1460,7 +1434,6 @@ static string PrintAccountBalance(Tuple<int, string, double, List<Tuple<int, dou
 }
 
 // Bonus tasks
-
 
 
 
